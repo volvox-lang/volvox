@@ -28,6 +28,7 @@
       <item>interface</item>
       <item>decl</item>
       <item>cdecl</item>
+      <item>func</item>
       <item>delete</item>
       <item>inline</item>
       <item>thread</item>

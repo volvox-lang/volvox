@@ -1605,21 +1605,42 @@ llvm::Value* CallExprAST::codegen_raw(llvm::Value* target) {
 					}
 					if (!arg) {
 						auto lit = dynamic_cast<LiteralExprAST*>(Args[i].get());
-						if (lit && lit->ft->type->isPointerTy()) {
+						if (lit && ft->type->isPointerTy()) {
 							llvm::Type* target_type =
 								(Proto->ArgTypes[i+arg_offs]->type_attr & A_ref) ?
 								llvm_ptr_type :
 								Proto->ArgTypes[i+arg_offs]->type;
 							arg = Builder->CreatePointerCast(Args[i]->codegen_raw(), target_type);
 						} else {
-							arg = Builder->CreateAlloca(Proto->ArgTypes[i+arg_offs]->type, nullptr, "tmprefarg");
-							//errs() << Loc << ": arg #" << i << " " << *arg << '\n';
-							auto tmparg = Args[i]->codegen_raw();
-							if (!tmparg) {
-								errs() << Args[i]->Loc << ": cannot generate code for expression\n";
-								return nullptr;
+							llvm::Type* alloc_ty;
+							llvm::Value* tmparg;
+							if (Proto->ArgTypes[i+arg_offs]->type->isFunctionTy()) {
+								alloc_ty = llvm_closure_type;
+								if (auto lval_call = dynamic_cast<CallExprAST*>(Args[i+arg_offs].get())) {
+									auto call_ptr = std::unique_ptr<CallExprAST>(lval_call);
+									Args[i+arg_offs].release();
+									auto lval_arg = std::make_unique<FunctionExprAST>(std::move(call_ptr));
+									auto tmparg0 = lval_arg->codegen_ref_(false, false);
+									if (!tmparg0.first || !tmparg0.second) {
+										errs() << Args[i+arg_offs]->Loc << ": cannot generate function reference\n";
+										return nullptr;
+									}
+									arg = tmparg0.second;
+								} else {
+									errs() << Args[i+arg_offs]->Loc << ": cannot get function reference\n";
+									return nullptr;
+								}
+							} else {
+								alloc_ty = Proto->ArgTypes[i+arg_offs]->type;
+								tmparg = Args[i]->codegen_raw();
+								if (!tmparg) {
+									errs() << Args[i]->Loc << ": cannot generate code for expression\n";
+									return nullptr;
+								}
+								arg = Builder->CreateAlloca(alloc_ty, nullptr, "tmprefarg");
+								//errs() << Loc << ": arg #" << i << " " << *arg << '\n';
+								Builder->CreateStore(tmparg, arg);
 							}
-							Builder->CreateStore(tmparg, arg);
 						}
 					}
 				} else {
