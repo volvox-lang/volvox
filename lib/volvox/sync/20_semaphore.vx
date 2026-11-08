@@ -172,8 +172,8 @@ struct pollfd {
 	revents i16
 }
 
-cdecl ppoll(&fds pollfd, nfds u32, ?timeout time.timespec, sigmask voidptr) int
-cdecl ppoll(&fds pollfd, nfds u64, ?timeout time.timespec, sigmask voidptr) int
+cdecl ppoll(&fds pollfd, nfds u32, timeout voidptr, sigmask voidptr) int
+cdecl ppoll(&fds pollfd, nfds u64, timeout voidptr, sigmask voidptr) int
 
 pub def Semaphore.wait bool
 	if this.err != 0
@@ -246,9 +246,9 @@ pub def Semaphore.timedwait(timeout time.Duration) bool
 		end_time = time.timespec_sum(start_time, timeo)
 		repeat
 			if os.isLinux
-				res = ppoll(pfd, size_t(1), timeo, nil)
+				res = ppoll(pfd, size_t(1), &timeo, nil)
 			else
-				res = ppoll(pfd, u32(1), timeo, nil)
+				res = ppoll(pfd, u32(1), &timeo, nil)
 			end
 			if res <= 0
 				if res < 0
@@ -313,9 +313,9 @@ pub def Semaphore.trywait bool
 		get = u64(0)
 		timeo = time.timespec{}
 		if os.isLinux
-			res = ppoll(pfd, size_t(1), timeo, nil)
+			res = ppoll(pfd, size_t(1), &timeo, nil)
 		else
-			res = ppoll(pfd, u32(1), timeo, nil)
+			res = ppoll(pfd, u32(1), &timeo, nil)
 		end
 		if res <= 0
 			if res < 0
