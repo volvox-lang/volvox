@@ -41,7 +41,11 @@ pub inline def tcp IpSocket
 			s.err = u32(WSAGetLastError())
 		end
 	else
-		s.handle = socket(AF_INET, SOCK_STREAM, 0)
+		if os.isNetBSD
+			s.handle = __socket30(AF_INET, SOCK_STREAM, 0)
+		else
+			s.handle = socket(AF_INET, SOCK_STREAM, 0)
+		end
 		if s.handle == -1
 			s.err = GetLastError
 		end
@@ -57,7 +61,11 @@ pub inline def udp IpSocket
 			s.err = u32(WSAGetLastError)
 		end
 	else
-		s.handle = socket(AF_INET, SOCK_DGRAM, 0)
+		if os.isNetBSD
+			s.handle = __socket30(AF_INET, SOCK_DGRAM, 0)
+		else
+			s.handle = socket(AF_INET, SOCK_DGRAM, 0)
+		end
 		if s.handle == -1
 			s.err = GetLastError
 		end
