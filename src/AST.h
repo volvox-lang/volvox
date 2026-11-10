@@ -505,7 +505,7 @@ public:
 	}
 	// function references are created by a pseudo call expression (to be able to match the signature)
 	FunctionExprAST(std::unique_ptr<CallExprAST> call)
-		: ReferencableExprAST(Loc, call->Proto->Name), need_address(true),
+		: ReferencableExprAST(call->Loc, call->Proto->Name), need_address(true),
 		  Callee(std::move(call->Callee)) {
 		ft = new_FullType(call->Proto->FT, 0);
 		ft->Protos = new_AnonProto(call->Proto, call->Loc);
