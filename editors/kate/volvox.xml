@@ -29,6 +29,7 @@
       <item>decl</item>
       <item>cdecl</item>
       <item>func</item>
+      <item>cfunc</item>
       <item>delete</item>
       <item>inline</item>
       <item>thread</item>

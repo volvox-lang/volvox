@@ -53,7 +53,7 @@
            '("brk" "elif" "else" "end" "def" "cdef" "if" "repeat" "return" "until" "while" "for")
 	   "\\|"))
 	(UNIX (mapconcat 'identity
-           '("inline" "atomic" "shared" "const" "global" "cdecl" "decl" "func" "delete" "clone" "init" "from" "import" "pub" "struct" "union" "cstruct")
+           '("inline" "atomic" "shared" "const" "global" "cdecl" "decl" "func" "cfunc" "delete" "clone" "init" "from" "import" "pub" "struct" "union" "cstruct")
 	   "\\|"))
     )
   (list

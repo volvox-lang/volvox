@@ -10,6 +10,7 @@ TOKEN(packed) \
 TOKEN(union) \
 TOKEN(const) \
 TOKEN(func) \
+TOKEN(cfunc) \
 TOKEN(unique) \
 TOKEN(shared) \
 TOKEN(atomic) \

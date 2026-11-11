@@ -107,6 +107,8 @@
           <keyword>delete</keyword>
           <keyword>inline</keyword>
           <keyword>thread</keyword>
+          <keyword>func</keyword>
+          <keyword>cfunc</keyword>
           <keyword>clone</keyword>
           <keyword>init</keyword>
           <keyword>in</keyword>
