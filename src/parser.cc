@@ -1839,7 +1839,12 @@ static std::unique_ptr<ExprAST> ParseForExpr(int terminator = 0) {
 
 static std::unique_ptr<ExprAST> ParseFunctionExpr(int terminator = 0) {
 	auto FnLoc = CurLoc;
-	unsigned visibility = A_closure;
+	auto FnKind = CurTok.kind;
+	unsigned visibility = 0;
+	if (FnKind == tok_func)
+		visibility = A_closure;
+	else if (FnKind == tok_cfunc)
+		visibility = A_cfunc;
 	return_kind_t old_return_kind = function_return_kind;
 	bool old_inside_function = inside_function;
 	auto ast = ParseDefinition(visibility);
@@ -1897,6 +1902,7 @@ static std::unique_ptr<ExprAST> ParsePrimary(int terminator = 0) {
 	case tok_for:
 		return ParseForExpr(terminator);
 	case tok_func:
+	case tok_cfunc:
 		return ParseFunctionExpr(terminator);
 	default:
 		errs() << CurLoc << ": unexpected token '" << CurTok.str() << "' when expecting a " << lex.Expected << " or an expression\n";
@@ -3014,7 +3020,7 @@ static bool ParseFnVisibility(unsigned& visibility) {
 
 /// definition := 'def' prototype expression
 std::unique_ptr<FunctionAST> ParseDefinition(unsigned& visibility) {
-	if (!(visibility & A_closure))
+	if (!(visibility & (A_closure | A_cfunc)))
 		if (!ParseFnVisibility(visibility))
 			return nullptr;
 	auto theLoc = CurLoc;
